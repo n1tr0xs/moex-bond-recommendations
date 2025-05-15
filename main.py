@@ -1,4 +1,3 @@
-from asyncio import Condition
 from dataclasses import dataclass
 import datetime
 import requests
@@ -7,10 +6,10 @@ import csv
 
 @dataclass
 class SearchCriteria:
-    MIN_RATE = 24.05
-    MAX_RATE = float("inf")
-    MIN_DAYS_TO_MAT = 0
-    MAX_DAYS_TO_MAT = float("inf")
+    min_bond_yield = 24.05
+    max_bond_yield = float("inf")
+    min_days_to_maturity = 0
+    max_days_to_maturity = float("inf")
 
 
 class Bond:
@@ -23,8 +22,8 @@ class Bond:
         face_value: float,
         coupon_value: float,
         coupon_period: int,
-        mat_date: datetime.date,
-        trading_price: float,
+        maturity_date: datetime.date,
+        bond_price: float,
         ACI: float,
     ):
         self.ISIN = ISIN
@@ -32,13 +31,13 @@ class Bond:
         self.face_value = face_value or 0
         self.coupon_value = coupon_value or 0
         self.coupon_period = coupon_period or float("inf")
-        self.mat_date = mat_date
-        self.trading_price = trading_price or float("inf")
+        self.maturity_date = maturity_date
+        self.bond_price = bond_price or float("inf")
         self.ACI = ACI
 
     @property
     def days_to_maturity(self):
-        return (self.mat_date - datetime.date.today()).days
+        return (self.maturity_date - datetime.date.today()).days
 
     @property
     def yield_to_maturity(self):
@@ -50,7 +49,7 @@ class Bond:
         coupons = full_coupons + bool(part_coupon)
         coupons_income = coupons * self.coupon_value
 
-        clean_price = self.face_value * self.trading_price / 100  # no ACI
+        clean_price = self.face_value * self.bond_price / 100  # no ACI
         price = clean_price + self.ACI  # current market price
         price *= 1 + self.BROKER_FEE  # including broker fee
 
@@ -60,7 +59,7 @@ class Bond:
         return round(rate, 2)
 
     def __str__(self):
-        return f"{self.ISIN=} {self.bond_name=} {self.face_value=} {self.coupon_value=} {self.coupon_period=} {self.mat_date=} {self.trading_price=} {self.ACI=}"
+        return f"{self.ISIN=} {self.bond_name=} {self.face_value=} {self.coupon_value=} {self.coupon_period=} {self.maturity_date=} {self.bond_price=} {self.ACI=}"
 
 
 def LOG(message: str) -> None:
@@ -69,7 +68,7 @@ def LOG(message: str) -> None:
 
 API_DELAY = round(60 / 50, 1)
 BOARDGROUPS = [58, 7, 105]
-conditions = SearchCriteria()
+search_criteria = SearchCriteria()
 
 
 def get_json(url: str) -> dict:
@@ -113,7 +112,7 @@ bonds: list[Bond] = []
 for i, ISIN in enumerate(securities_data, start=1):
     LOG(f"Строка {i} из {len(securities_data)}.")
     try:
-        # Достаем данные для облигации
+        # Parsing data for bond
         bond_name = str(securities_data[ISIN][1])
         face_value = float(securities_data[ISIN][2])
         coupon_value = float(securities_data[ISIN][3])
@@ -137,19 +136,21 @@ for i, ISIN in enumerate(securities_data, start=1):
         bond_price=bond_price,
         ACI=ACI,
     )
-    # Проверка соответствия облигации условиям
+    # Checking search criteria
     condition = (
-        conditions.MIN_DAYS_TO_MAT
+        search_criteria.min_days_to_maturity
         <= bond.days_to_maturity
-        <= conditions.MAX_DAYS_TO_MAT
-        and conditions.MIN_RATE <= bond.yield_to_maturity <= conditions.MAX_RATE
+        <= search_criteria.max_days_to_maturity
+        and search_criteria.min_bond_yield
+        <= bond.yield_to_maturity
+        <= search_criteria.max_bond_yield
     )
 
     if condition:
         LOG(
             f"Условие "
-            f"доходности {conditions.MIN_RATE} <= {bond.yield_to_maturity} <= {conditions.MAX_RATE} "
-            f"дней до погашения {conditions.MIN_DAYS_TO_MAT} <= {bond.days_to_maturity} <= {conditions.MAX_DAYS_TO_MAT} "
+            f"доходности {search_criteria.min_bond_yield} <= {bond.yield_to_maturity} <= {search_criteria.max_bond_yield} "
+            f"дней до погашения {search_criteria.min_days_to_maturity} <= {bond.days_to_maturity} <= {search_criteria.max_days_to_maturity} "
             f"для {bond_name} с ISIN {ISIN} прошло."
         )
         bonds.append(bond)
@@ -162,7 +163,7 @@ with open("out.csv", "w") as csvfile:
     for bond in bonds:
         writer.writerow(
             [
-                bond.name,
+                bond.bond_name,
                 bond.ISIN,
                 bond.days_to_maturity,
                 str(bond.yield_to_maturity).replace(",", "."),
