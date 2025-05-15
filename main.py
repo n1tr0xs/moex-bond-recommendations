@@ -105,7 +105,7 @@ market_data: dict = {
 
 bonds: list[Bond] = []
 for i, ISIN in enumerate(securities_data, start=1):
-    LOG(f"Строка {i} из {len(securities_data)}." f"SECID = {ISIN}.")
+    LOG(f"Строка {i} из {len(securities_data)}.")
     try:
         bond: Bond = Bond(
             ISIN,
@@ -132,12 +132,6 @@ for i, ISIN in enumerate(securities_data, start=1):
             f"Доходность: {MIN_RATE} <= {bond.yield_to_maturity} <= {MAX_RATE}"
         )
 
-
-for bond in bonds:
-    LOG(
-        f"Прибыльность {bond.name} {bond.ISIN} = {bond.yield_to_maturity}%. "
-        f"Дней до погашения: {bond.days_to_maturity}."
-    )
 
 with open("out.csv", "w") as csvfile:
     writer = csv.writer(csvfile, dialect="excel")
