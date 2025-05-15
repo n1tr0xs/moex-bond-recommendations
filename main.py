@@ -4,6 +4,7 @@ import requests
 import csv
 
 
+
 @dataclass
 class SearchCriteria:
     min_bond_yield = 24.05
@@ -61,6 +62,20 @@ class Bond:
     def __str__(self):
         return f"{self.ISIN=} {self.bond_name=} {self.face_value=} {self.coupon_value=} {self.coupon_period=} {self.maturity_date=} {self.bond_price=} {self.ACI=}"
 
+def output_to_csv(filename: str, bond_list: list[Bond]) -> None:
+    with open(filename, "w") as csvfile:
+        writer = csv.writer(csvfile, dialect="excel")
+        writer.writerow(["Название", "ISIN", "Дней до погашения", "Доходность"])
+        for bond in bond_list:
+            writer.writerow(
+                [
+                    bond.bond_name,
+                    bond.ISIN,
+                    bond.days_to_maturity,
+                    str(bond.yield_to_maturity).replace(",", "."),
+                ]
+            )
+    return
 
 def LOG(message: str) -> None:
     print(message)
@@ -157,15 +172,4 @@ for i, ISIN in enumerate(securities_data, start=1):
     else:
         LOG(f"{bond_name} с ISIN {ISIN} не соответсвует критериям поиска.")
 
-with open("out.csv", "w") as csvfile:
-    writer = csv.writer(csvfile, dialect="excel")
-    writer.writerow(["Название", "ISIN", "Дней до погашения", "Доходность"])
-    for bond in bonds:
-        writer.writerow(
-            [
-                bond.bond_name,
-                bond.ISIN,
-                bond.days_to_maturity,
-                str(bond.yield_to_maturity).replace(",", "."),
-            ]
-        )
+output_to_csv('out.csv', bonds)
