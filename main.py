@@ -3,35 +3,45 @@ import requests
 import csv
 
 MIN_RATE = 24.05
-MAX_RATE = float('inf')
+MAX_RATE = float("inf")
 MIN_DAYS_TO_MAT = 0
-MAX_DAYS_TO_MAT = float('inf')
+MAX_DAYS_TO_MAT = float("inf")
 
 
 class Bond:
-    BROKER_FEE = 0.25/100
+    BROKER_FEE = 0.25 / 100
 
-    def __init__(self, ISIN: str, name: str, face_value: float, coupon_value: float, coupon_period: int, mat_date: datetime.date, trading_price: float, ACI: float):
+    def __init__(
+        self,
+        ISIN: str,
+        name: str,
+        face_value: float,
+        coupon_value: float,
+        coupon_period: int,
+        mat_date: datetime.date,
+        trading_price: float,
+        ACI: float,
+    ):
         self.ISIN = ISIN
         self.name = name
         self.face_value = face_value or 0
         self.coupon_value = coupon_value or 0
-        self.coupon_period = coupon_period or float('inf')
+        self.coupon_period = coupon_period or float("inf")
         self.mat_date = mat_date
-        self.trading_price = trading_price or float('inf')
+        self.trading_price = trading_price or float("inf")
         self.ACI = ACI
 
     @property
     def days_to_maturity(self):
-        return (self.mat_date-datetime.date.today()).days
+        return (self.mat_date - datetime.date.today()).days
 
     @property
     def yield_to_maturity(self):
         if self.days_to_maturity <= 0:
             return 0
 
-        full_coupons, part_coupon = divmod(
-            self.days_to_maturity, self.coupon_period)
+        full_coupons, part_coupon = divmod(self.days_to_maturity, self.coupon_period)
+
         coupons = full_coupons + bool(part_coupon)
         coupons_income = coupons * self.coupon_value
 
@@ -39,7 +49,7 @@ class Bond:
         price = clean_price + self.ACI  # current market price
         price *= 1 + self.BROKER_FEE  # including broker fee
 
-        total_income = self.face_value+coupons_income
+        total_income = self.face_value + coupons_income
         rate = (total_income / price - 1) * 100 * 365 / self.days_to_maturity
 
         return round(rate, 2)
@@ -85,24 +95,17 @@ if not (json_data and json_data.get("marketdata", {}).get("data")):
 # next boardgroup
 
 bond_list: list = json_data.get("securities", {}).get("data", [])
-securities_data: dict = {
-    item[0]: item
-    for item in bond_list
-}
+securities_data: dict = {item[0]: item for item in bond_list}
 LOG(f"Всего в списке группы {boardgroup} {len(bond_list)} бумаг.")
 
 
 market_data: dict = {
-    item[0]: item
-    for item in json_data.get("marketdata", {}).get("data", [])
+    item[0]: item for item in json_data.get("marketdata", {}).get("data", [])
 }
 
 bonds: list[Bond] = []
 for i, ISIN in enumerate(securities_data, start=1):
-    LOG(
-        f"Строка {i} из {len(securities_data)}."
-        f"SECID = {ISIN}."
-    )
+    LOG(f"Строка {i} из {len(securities_data)}." f"SECID = {ISIN}.")
     try:
         bond: Bond = Bond(
             ISIN,
@@ -110,18 +113,16 @@ for i, ISIN in enumerate(securities_data, start=1):
             securities_data[ISIN][2],
             securities_data[ISIN][3],
             securities_data[ISIN][4],
-            datetime.datetime.strptime(
-                securities_data[ISIN][5], "%Y-%m-%d").date(),
+            datetime.datetime.strptime(securities_data[ISIN][5], "%Y-%m-%d").date(),
             market_data[ISIN][1],
-            securities_data[ISIN][6]
+            securities_data[ISIN][6],
         )
     except ValueError:
         continue
 
     if (
         MIN_DAYS_TO_MAT <= bond.days_to_maturity <= MAX_DAYS_TO_MAT
-        and
-        MIN_RATE <= bond.yield_to_maturity <= MAX_RATE
+        and MIN_RATE <= bond.yield_to_maturity <= MAX_RATE
     ):
         bonds.append(bond)
     else:
@@ -138,10 +139,15 @@ for bond in bonds:
         f"Дней до погашения: {bond.days_to_maturity}."
     )
 
-with open('out.csv', 'w') as csvfile:
-    writer = csv.writer(csvfile, dialect='excel')
-    writer.writerow(['Название', 'ISIN', 'Дней до погашения', 'Доходность'])
+with open("out.csv", "w") as csvfile:
+    writer = csv.writer(csvfile, dialect="excel")
+    writer.writerow(["Название", "ISIN", "Дней до погашения", "Доходность"])
     for bond in bonds:
         writer.writerow(
-            [bond.name, bond.ISIN, bond.days_to_maturity, str(bond.yield_to_maturity).replace(',', '.')]
+            [
+                bond.name,
+                bond.ISIN,
+                bond.days_to_maturity,
+                str(bond.yield_to_maturity).replace(",", "."),
+            ]
         )
