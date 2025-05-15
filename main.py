@@ -19,7 +19,7 @@ class Bond:
     def __init__(
         self,
         ISIN: str,
-        name: str,
+        bond_name: str,
         face_value: float,
         coupon_value: float,
         coupon_period: int,
@@ -28,12 +28,12 @@ class Bond:
         ACI: float,
     ):
         self.ISIN = ISIN
-        self.name = name
-        self.face_value = face_value
-        self.coupon_value = coupon_value
-        self.coupon_period = coupon_period
+        self.bond_name = bond_name
+        self.face_value = face_value or 0
+        self.coupon_value = coupon_value or 0
+        self.coupon_period = coupon_period or float("inf")
         self.mat_date = mat_date
-        self.trading_price = trading_price
+        self.trading_price = trading_price or float("inf")
         self.ACI = ACI
 
     @property
@@ -60,7 +60,7 @@ class Bond:
         return round(rate, 2)
 
     def __str__(self):
-        return f"{self.ISIN=} {self.name=} {self.face_value=} {self.coupon_value=} {self.coupon_period=} {self.mat_date=} {self.trading_price=} {self.ACI=}"
+        return f"{self.ISIN=} {self.bond_name=} {self.face_value=} {self.coupon_value=} {self.coupon_period=} {self.mat_date=} {self.trading_price=} {self.ACI=}"
 
 
 def LOG(message: str) -> None:
@@ -113,31 +113,31 @@ bonds: list[Bond] = []
 for i, ISIN in enumerate(securities_data, start=1):
     LOG(f"Строка {i} из {len(securities_data)}.")
     try:
-        bond_name = securities_data[ISIN][1]
+        # Достаем данные для облигации
+        bond_name = str(securities_data[ISIN][1])
         face_value = float(securities_data[ISIN][2])
         coupon_value = float(securities_data[ISIN][3])
-        coupon_perid = float(securities_data[ISIN][4])
+        coupon_period = float(securities_data[ISIN][4])
         maturity_date = datetime.datetime.strptime(
             securities_data[ISIN][5], "%Y-%m-%d"
         ).date()
-        bond_price = market_data[ISIN][1]
-        ACI = securities_data[ISIN][6]
+        bond_price = float(market_data[ISIN][1])
+        ACI = float(securities_data[ISIN][6])
     except Exception as e:
-        LOG(f"Ошибка преобразования данных.")
-        LOG(f"Пропуск {ISIN}.")
+        LOG(f"Ошибка преобразования данных. Пропуск {ISIN}.")
         continue
 
     bond: Bond = Bond(
-        ISIN,
-        bond_name,
-        face_value,
-        coupon_value,
-        coupon_perid,
-        maturity_date,
-        bond_price,
-        ACI,
+        ISIN=ISIN,
+        bond_name=bond_name,
+        face_value=face_value,
+        coupon_value=coupon_value,
+        coupon_period=coupon_period,
+        maturity_date=maturity_date,
+        bond_price=bond_price,
+        ACI=ACI,
     )
-
+    # Проверка соответствия облигации условиям
     condition = (
         conditions.MIN_DAYS_TO_MAT
         <= bond.days_to_maturity
@@ -147,9 +147,9 @@ for i, ISIN in enumerate(securities_data, start=1):
 
     if condition:
         LOG(
-            f"Условие"
-            f"доходности {conditions.MIN_RATE} <= {bond.yield_to_maturity} <= {conditions.MAX_RATE}"
-            f"дней до погашения {conditions.MIN_DAYS_TO_MAT} <= {bond.days_to_maturity} <= {conditions.MAX_DAYS_TO_MAT}"
+            f"Условие "
+            f"доходности {conditions.MIN_RATE} <= {bond.yield_to_maturity} <= {conditions.MAX_RATE} "
+            f"дней до погашения {conditions.MIN_DAYS_TO_MAT} <= {bond.days_to_maturity} <= {conditions.MAX_DAYS_TO_MAT} "
             f"для {bond_name} с ISIN {ISIN} прошло."
         )
         bonds.append(bond)
