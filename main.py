@@ -1,12 +1,15 @@
+from asyncio import Condition
+from dataclasses import dataclass
 import datetime
 import requests
 import csv
 
-MIN_RATE = 24.05
-MAX_RATE = float("inf")
-MIN_DAYS_TO_MAT = 0
-MAX_DAYS_TO_MAT = float("inf")
-
+@dataclass
+class SearchCriteria:
+    MIN_RATE = 24.05
+    MAX_RATE = float("inf")
+    MIN_DAYS_TO_MAT = 0
+    MAX_DAYS_TO_MAT = float("inf")
 
 class Bond:
     BROKER_FEE = 0.25 / 100
@@ -64,7 +67,7 @@ def LOG(message: str) -> None:
 
 API_DELAY = round(60 / 50, 1)
 BOARDGROUPS = [58, 7, 105]
-
+conditions = SearchCriteria()
 
 def get_json(url: str) -> dict:
     response = requests.get(url)
@@ -120,18 +123,22 @@ for i, ISIN in enumerate(securities_data, start=1):
     except ValueError:
         continue
 
-    if (
-        MIN_DAYS_TO_MAT <= bond.days_to_maturity <= MAX_DAYS_TO_MAT
-        and MIN_RATE <= bond.yield_to_maturity <= MAX_RATE
-    ):
+    condition = (
+        conditions.MIN_DAYS_TO_MAT <= bond.days_to_maturity <= conditions.MAX_DAYS_TO_MAT
+        and conditions.MIN_RATE <= bond.yield_to_maturity <= conditions.MAX_RATE
+    )
+
+    
+    if condition:
+        LOG(
+            f"Условие"
+            f"доходности {conditions.MIN_RATE} <= {bond.yield_to_maturity} <= {conditions.MAX_RATE}"
+            f"дней до погашения {conditions.MIN_DAYS_TO_MAT} <= {bond.days_to_maturity} <= {conditions.MAX_DAYS_TO_MAT}"
+            f"для {securities_data[ISIN][1]} с ISIN {ISIN} прошло."
+         )     
         bonds.append(bond)
     else:
-        LOG(
-            f"Облигация {bond.name} {bond.ISIN} не прошла проверку условий:\n"
-            f"Дней до погашения: {MIN_DAYS_TO_MAT} <= {bond.days_to_maturity} <= {MAX_DAYS_TO_MAT}\n"
-            f"Доходность: {MIN_RATE} <= {bond.yield_to_maturity} <= {MAX_RATE}"
-        )
-
+        LOG(f"{securities_data[ISIN][1]} с ISIN {ISIN} не соответсвует критериям поиска.")
 
 with open("out.csv", "w") as csvfile:
     writer = csv.writer(csvfile, dialect="excel")
