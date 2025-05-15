@@ -4,12 +4,14 @@ import datetime
 import requests
 import csv
 
+
 @dataclass
 class SearchCriteria:
     MIN_RATE = 24.05
     MAX_RATE = float("inf")
     MIN_DAYS_TO_MAT = 0
     MAX_DAYS_TO_MAT = float("inf")
+
 
 class Bond:
     BROKER_FEE = 0.25 / 100
@@ -27,11 +29,11 @@ class Bond:
     ):
         self.ISIN = ISIN
         self.name = name
-        self.face_value = face_value or 0
-        self.coupon_value = coupon_value or 0
-        self.coupon_period = coupon_period or float("inf")
+        self.face_value = face_value
+        self.coupon_value = coupon_value
+        self.coupon_period = coupon_period
         self.mat_date = mat_date
-        self.trading_price = trading_price or float("inf")
+        self.trading_price = trading_price
         self.ACI = ACI
 
     @property
@@ -68,6 +70,7 @@ def LOG(message: str) -> None:
 API_DELAY = round(60 / 50, 1)
 BOARDGROUPS = [58, 7, 105]
 conditions = SearchCriteria()
+
 
 def get_json(url: str) -> dict:
     response = requests.get(url)
@@ -110,35 +113,48 @@ bonds: list[Bond] = []
 for i, ISIN in enumerate(securities_data, start=1):
     LOG(f"Строка {i} из {len(securities_data)}.")
     try:
-        bond: Bond = Bond(
-            ISIN,
-            securities_data[ISIN][1],
-            securities_data[ISIN][2],
-            securities_data[ISIN][3],
-            securities_data[ISIN][4],
-            datetime.datetime.strptime(securities_data[ISIN][5], "%Y-%m-%d").date(),
-            market_data[ISIN][1],
-            securities_data[ISIN][6],
-        )
-    except ValueError:
+        bond_name = securities_data[ISIN][1]
+        face_value = float(securities_data[ISIN][2])
+        coupon_value = float(securities_data[ISIN][3])
+        coupon_perid = float(securities_data[ISIN][4])
+        maturity_date = datetime.datetime.strptime(
+            securities_data[ISIN][5], "%Y-%m-%d"
+        ).date()
+        bond_price = market_data[ISIN][1]
+        ACI = securities_data[ISIN][6]
+    except Exception as e:
+        LOG(f"Ошибка преобразования данных.")
+        LOG(f"Пропуск {ISIN}.")
         continue
 
+    bond: Bond = Bond(
+        ISIN,
+        bond_name,
+        face_value,
+        coupon_value,
+        coupon_perid,
+        maturity_date,
+        bond_price,
+        ACI,
+    )
+
     condition = (
-        conditions.MIN_DAYS_TO_MAT <= bond.days_to_maturity <= conditions.MAX_DAYS_TO_MAT
+        conditions.MIN_DAYS_TO_MAT
+        <= bond.days_to_maturity
+        <= conditions.MAX_DAYS_TO_MAT
         and conditions.MIN_RATE <= bond.yield_to_maturity <= conditions.MAX_RATE
     )
 
-    
     if condition:
         LOG(
             f"Условие"
             f"доходности {conditions.MIN_RATE} <= {bond.yield_to_maturity} <= {conditions.MAX_RATE}"
             f"дней до погашения {conditions.MIN_DAYS_TO_MAT} <= {bond.days_to_maturity} <= {conditions.MAX_DAYS_TO_MAT}"
-            f"для {securities_data[ISIN][1]} с ISIN {ISIN} прошло."
-         )     
+            f"для {bond_name} с ISIN {ISIN} прошло."
+        )
         bonds.append(bond)
     else:
-        LOG(f"{securities_data[ISIN][1]} с ISIN {ISIN} не соответсвует критериям поиска.")
+        LOG(f"{bond_name} с ISIN {ISIN} не соответсвует критериям поиска.")
 
 with open("out.csv", "w") as csvfile:
     writer = csv.writer(csvfile, dialect="excel")
