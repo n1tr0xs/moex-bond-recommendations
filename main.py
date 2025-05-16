@@ -11,6 +11,7 @@ class SearchCriteria:
     max_bond_yield: float = float("inf")
     min_days_to_maturity: float = 0
     max_days_to_maturity: float = float("inf")
+    face_units: list[str] = ("SUR",)
 
 
 class Bond:
@@ -155,7 +156,7 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
         f"https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/{boardgroup}/securities.json?"
         "iss.dp=comma&iss.meta=off&"
         "iss.only=securities&"
-        "securities.columns=ISIN,SHORTNAME,FACEVALUE,COUPONVALUE,COUPONPERIOD,MATDATE,PREVLEGALCLOSEPRICE,ACCRUEDINT&"
+        "securities.columns=ISIN,SHORTNAME,FACEVALUE,COUPONVALUE,COUPONPERIOD,MATDATE,PREVLEGALCLOSEPRICE,ACCRUEDINT,FACEUNIT&"
     )
     LOG(f"Ссылка поиска всех доступных облигаций группы {boardgroup}: {url}.\n\n")
 
@@ -226,6 +227,8 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
             LOG(f"Пропуск {ISIN}")
             continue
 
+        face_unit = securities_data[ISIN][8]
+
         bond: Bond = Bond(
             ISIN=ISIN,
             bond_name=bond_name,
@@ -245,6 +248,7 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
             and search_criteria.min_bond_yield
             <= bond.yield_to_maturity
             <= search_criteria.max_bond_yield
+            and face_unit in search_criteria.face_units
         )
 
         if condition:
@@ -252,6 +256,7 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
                 f"Условие "
                 f"доходности ({search_criteria.min_bond_yield}% <= {bond.yield_to_maturity}% <= {search_criteria.max_bond_yield}%), "
                 f"дней до погашения ({search_criteria.min_days_to_maturity} <= {bond.days_to_maturity} <= {search_criteria.max_days_to_maturity}), "
+                f"валюта ({face_unit} в {search_criteria.face_units}) "
                 f"для {ISIN} прошло."
             )
 
