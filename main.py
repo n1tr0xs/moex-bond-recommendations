@@ -48,7 +48,8 @@ class Bond:
             "ISIN",
             "Дней до погашения",
             "Доходность к погашению",
-            "Валюта" "Требуется квалификация",
+            "Валюта",
+            "Требуется квалификация",
         ]
 
     @property
@@ -253,7 +254,8 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
             <= bond.yield_to_maturity
             <= search_criteria.max_bond_yield
             and (
-                search_criteria.face_units and (bond.face_unit in search_criteria.face_units)
+                search_criteria.face_units
+                and (bond.face_unit in search_criteria.face_units)
             )
         )
 
