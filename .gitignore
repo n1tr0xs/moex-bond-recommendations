@@ -175,4 +175,5 @@ cython_debug/
 
 # My
 *.csv
+*.xlsx
 .vs/
