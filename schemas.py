@@ -4,7 +4,7 @@ import datetime
 
 @dataclass
 class SearchCriteria:
-    min_bond_yield: float = 24.05
+    min_bond_yield: float = 0
     max_bond_yield: float = float("inf")
     min_days_to_maturity: float = 0
     max_days_to_maturity: float = float("inf")
