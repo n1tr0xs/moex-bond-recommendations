@@ -22,7 +22,7 @@ class ExcelBook:
         # Auto-width
         self.auto_width(ws)
         wb.save(self.file_name)
-        log.info(f"Результаты сохранены в файл {self.file_name}.")
+        log.info(f"\nРезультаты сохранены в файл {self.file_name}.")
 
     def center_worksheet(
         self, worksheet: openpyxl.worksheet.worksheet.Worksheet
