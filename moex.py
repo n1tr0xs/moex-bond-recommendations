@@ -8,11 +8,19 @@ class MOEX_API:
     API_DELAY = round(60 / 50, 1)
     BOARDGROUPS = [7, 58, 105]
 
-    def __init__(self, log: Log):
+    def __init__(self, log: Log, check_bond_qual:bool=False):
         self.log = log
+        self.last_api_time = None
+        self.check_bond_qual = check_bond_qual
 
     def get_json(self, url: str) -> dict:
-        time.sleep(self.API_DELAY)
+        now = datetime.datetime.now()
+        
+        if self.last_api_time:
+            delta = (now - self.last_api_time).total_seconds()
+            if delta < self.API_DELAY:
+                time.sleep(self.API_DELAY-delta)
+        self.last_api_time = datetime.datetime.now()
         response = requests.get(url)
         return response.json()
 
@@ -195,7 +203,8 @@ class MOEX_API:
                     f"для {ISIN} прошло."
                 )
 
-                bond.is_qualified = self.get_bond_qualification(ISIN)
+                if self.check_bond_qual:
+                    bond.is_qualified = self.get_bond_qualification(ISIN)
 
                 bonds.append(bond)
             else:
