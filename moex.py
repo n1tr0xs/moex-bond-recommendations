@@ -195,7 +195,7 @@ class MOEX_API:
                     f"для {ISIN} прошло."
                 )
 
-                #bond.is_qualified = self.get_bond_qualification(ISIN)
+                bond.is_qualified = self.get_bond_qualification(ISIN)
 
                 bonds.append(bond)
             else:
