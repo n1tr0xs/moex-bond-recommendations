@@ -28,7 +28,7 @@ class Bond:
         bond_price: float,
         ACI: float,
         face_unit: str,
-        is_qualified: bool = False,
+        is_qualified: bool = None,
     ):
         self.ISIN: str = ISIN
         self.bond_name: str = bond_name
@@ -60,7 +60,7 @@ class Bond:
             self.days_to_maturity,
             self.yield_to_maturity,
             self.face_unit,
-            "Да" if self.is_qualified else "Нет",
+            "Неизвестно" if self.is_qualified is None else "Да" if self.is_qualified else "Нет",
         ]
 
     @property
