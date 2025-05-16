@@ -11,7 +11,7 @@ class SearchCriteria:
     max_bond_yield: float = float("inf")
     min_days_to_maturity: float = 0
     max_days_to_maturity: float = float("inf")
-    face_units: list[str] = ("SUR",)
+    face_units: list[str] | None = ("SUR",)  # Use None if don't care about face unit
 
 
 class Bond:
@@ -27,6 +27,7 @@ class Bond:
         maturity_date: datetime.date,
         bond_price: float,
         ACI: float,
+        face_unit: str,
         is_qualified: bool = False,
     ):
         self.ISIN: str = ISIN
@@ -37,6 +38,7 @@ class Bond:
         self.maturity_date: datetime.date = maturity_date
         self.bond_price: float = bond_price or float("inf")
         self.ACI: float = ACI
+        self.face_unit: str = face_unit
         self.is_qualified: bool = is_qualified
 
     @classmethod
@@ -46,7 +48,7 @@ class Bond:
             "ISIN",
             "Дней до погашения",
             "Доходность к погашению",
-            "Требуется квалификация",
+            "Валюта" "Требуется квалификация",
         ]
 
     @property
@@ -56,6 +58,7 @@ class Bond:
             self.ISIN,
             self.days_to_maturity,
             self.yield_to_maturity,
+            self.face_unit,
             "Да" if self.is_qualified else "Нет",
         ]
 
@@ -238,6 +241,7 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
             maturity_date=maturity_date,
             bond_price=bond_price,
             ACI=ACI,
+            face_unit=face_unit,
         )
 
         # Checking basic search criteria
@@ -248,7 +252,9 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
             and search_criteria.min_bond_yield
             <= bond.yield_to_maturity
             <= search_criteria.max_bond_yield
-            and face_unit in search_criteria.face_units
+            and (
+                search_criteria.face_units and (bond.face_unit in search_criteria.face_units)
+            )
         )
 
         if condition:
@@ -256,7 +262,7 @@ def parse_boardgroup(boardgroup: int) -> list[Bond]:
                 f"Условие "
                 f"доходности ({search_criteria.min_bond_yield}% <= {bond.yield_to_maturity}% <= {search_criteria.max_bond_yield}%), "
                 f"дней до погашения ({search_criteria.min_days_to_maturity} <= {bond.days_to_maturity} <= {search_criteria.max_days_to_maturity}), "
-                f"валюта ({face_unit} в {search_criteria.face_units}) "
+                f"валюта ({bond.face_unit} в {search_criteria.face_units}) "
                 f"для {ISIN} прошло."
             )
 
