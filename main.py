@@ -93,6 +93,23 @@ def output_to_excel(bond_list: list[Bond]) -> None:
     ws.append(Bond.headers())
     for bond in bond_list:
         ws.append(bond.as_list)
+    # Center data
+    center_alignment = openpyxl.styles.Alignment(horizontal="center")
+    for row in ws.iter_rows(
+        min_row=1,
+        max_row=ws.max_row,
+        min_col=1,
+        max_col=ws.max_column,
+    ):
+        for cell in row:
+            cell.alignment = center_alignment
+    # Auto-width
+    for column_cells in ws.columns:
+        length = max(len(str(cell.value)) for cell in column_cells if cell.value)
+        ws.column_dimensions[
+            openpyxl.utils.get_column_letter(column_cells[0].col_idx)
+        ].width = (length * 1.1)
+    # save file
     wb.save(f"{datetime.datetime.now().strftime('%Y-%m-%d')}.xlsx")
     return
 
