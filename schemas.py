@@ -1,6 +1,7 @@
 ﻿from dataclasses import dataclass
 import datetime
 
+
 @dataclass
 class SearchCriteria:
     min_bond_yield: float = 24.05
@@ -56,7 +57,11 @@ class Bond:
             self.days_to_maturity,
             self.yield_to_maturity,
             self.face_unit,
-            "Неизвестно" if self.is_qualified is None else "Да" if self.is_qualified else "Нет",
+            (
+                "Неизвестно"
+                if self.is_qualified is None
+                else "Да" if self.is_qualified else "Нет"
+            ),
         ]
 
     @property
@@ -67,8 +72,12 @@ class Bond:
     def yield_to_maturity(self):
         if self.days_to_maturity <= 0:
             return 0
-
-        full_coupons, part_coupon = divmod(self.days_to_maturity, self.coupon_period)
+        if self.coupon_period:
+            full_coupons, part_coupon = divmod(
+                self.days_to_maturity, self.coupon_period
+            )
+        else:
+            full_coupons, part_coupon = 0, 0
 
         coupons = full_coupons + bool(part_coupon)
         coupons_income = coupons * self.coupon_value
