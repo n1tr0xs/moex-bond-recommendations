@@ -87,7 +87,7 @@ class MOEX_API:
             f"https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/{boardgroup}/securities.json?"
             "iss.dp=comma&iss.meta=off&"
             "iss.only=securities&"
-            "securities.columns=ISIN,SHORTNAME,FACEVALUE,COUPONVALUE,COUPONPERIOD,MATDATE,PREVLEGALCLOSEPRICE,ACCRUEDINT,FACEUNIT&"
+            "securities.columns=SECID,SHORTNAME,FACEVALUE,COUPONVALUE,COUPONPERIOD,MATDATE,PREVLEGALCLOSEPRICE,ACCRUEDINT,FACEUNIT&"
         )
         self.log.info(
             f"\nСсылка поиска всех доступных облигаций группы {boardgroup}: {url}.\n"
@@ -186,7 +186,7 @@ class MOEX_API:
                 <= bond.days_to_maturity
                 <= search_criteria.max_days_to_maturity
                 and search_criteria.min_bond_yield
-                <= bond.yield_to_maturity
+                <= bond.approximate_yield
                 <= search_criteria.max_bond_yield
                 and (
                     search_criteria.face_units
@@ -197,7 +197,7 @@ class MOEX_API:
             if condition:
                 self.log.info(
                     f"Условие "
-                    f"доходности ({search_criteria.min_bond_yield}% <= {bond.yield_to_maturity}% <= {search_criteria.max_bond_yield}%), "
+                    f"доходности ({search_criteria.min_bond_yield}% <= {bond.approximate_yield}% <= {search_criteria.max_bond_yield}%), "
                     f"дней до погашения ({search_criteria.min_days_to_maturity} <= {bond.days_to_maturity} <= {search_criteria.max_days_to_maturity}), "
                     f"валюта ({bond.face_unit} в {search_criteria.face_units}) "
                     f"для {ISIN} прошло."

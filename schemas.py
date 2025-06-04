@@ -43,6 +43,9 @@ class Bond:
         return [
             "Наименование",
             "ISIN",
+            "Номинал",
+            "Цена на бирже",
+            "Номинал купона",
             "Дней до погашения",
             "Доходность к погашению",
             "Валюта",
@@ -54,8 +57,11 @@ class Bond:
         return [
             self.bond_name,
             self.ISIN,
+            self.face_value,
+            self.broker_price,
+            self.coupon_value,
             self.days_to_maturity,
-            self.yield_to_maturity,
+            self.approximate_yield,
             self.face_unit,
             (
                 "Неизвестно"
@@ -65,28 +71,37 @@ class Bond:
         ]
 
     @property
-    def days_to_maturity(self):
-        return (self.maturity_date - datetime.date.today()).days
+    def broker_price(self):
+        price = self.face_value * self.bond_price / 100  # no ACI
+        price = price + self.ACI  # current market price
+        price *= 1 + self.BROKER_FEE  # including broker fee
+        return price
 
     @property
-    def yield_to_maturity(self):
-        if self.days_to_maturity <= 0:
-            return 0
+    def coupons_amount(self):
         if self.coupon_period:
             full_coupons, part_coupon = divmod(
                 self.days_to_maturity, self.coupon_period
             )
         else:
             full_coupons, part_coupon = 0, 0
-
         coupons = full_coupons + bool(part_coupon)
-        coupons_income = coupons * self.coupon_value
+        return coupons
 
-        clean_price = self.face_value * self.bond_price / 100  # no ACI
-        price = clean_price + self.ACI  # current market price
-        price *= 1 + self.BROKER_FEE  # including broker fee
+    @property
+    def days_to_maturity(self):
+        return (self.maturity_date - datetime.date.today()).days
+
+    @property
+    def approximate_yield(self):
+        if self.days_to_maturity <= 0:
+            return 0
+
+        coupons_income = self.coupons_amount * self.coupon_value
 
         total_income = self.face_value + coupons_income
-        rate = (total_income / price - 1) * 100 * 365 / self.days_to_maturity
+        rate = (
+            (total_income / self.broker_price - 1) * 100 * 365 / self.days_to_maturity
+        )
 
         return round(rate, 2)
