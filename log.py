@@ -9,7 +9,7 @@ class Log:
         ERROR = 2, "[ERROR]"
 
     def __init__(self):
-        self.file_name: str = datetime.datetime.now().strftime("%Y-%m-%d") + ".txt"
+        self.file_name: str = datetime.datetime.now().strftime("%d.%m.%Y") + ".txt"
         self._logs: list[str] = []
 
     def info(self, message: str) -> None:

@@ -8,7 +8,7 @@ from log import Log
 class ExcelBook:
     def __init__(self, file_name_prefix: str = ""):
         self.file_name = (
-            file_name_prefix + datetime.datetime.now().strftime("%Y-%m-%d") + ".xlsx"
+            file_name_prefix + datetime.datetime.now().strftime("%d.%m.%Y") + ".xlsx"
         )
 
     def write(self, bond_list: list[Bond], log: Log) -> None:
