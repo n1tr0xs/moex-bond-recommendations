@@ -182,15 +182,14 @@ class MOEX_API:
 
             # Checking basic search criteria
             condition = (
-                search_criteria.min_days_to_maturity
+                (search_criteria.min_days_to_maturity
                 <= bond.days_to_maturity
-                <= search_criteria.max_days_to_maturity
-                and search_criteria.min_bond_yield
+                <= search_criteria.max_days_to_maturity)
+                and (search_criteria.min_bond_yield
                 <= bond.approximate_yield
-                <= search_criteria.max_bond_yield
+                <= search_criteria.max_bond_yield)
                 and (
-                    search_criteria.face_units
-                    and (bond.face_unit in search_criteria.face_units)
+                    (search_criteria.face_units is None) or (bond.face_unit in search_criteria.face_units)
                 )
             )
 
