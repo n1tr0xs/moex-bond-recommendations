@@ -8,18 +8,18 @@ class MOEX_API:
     API_DELAY = round(60 / 50, 1)
     BOARDGROUPS = [7, 58, 105]
 
-    def __init__(self, log: Log, check_bond_qual:bool=False):
+    def __init__(self, log: Log, check_bond_qual: bool = False):
         self.log = log
         self.last_api_time = None
         self.check_bond_qual = check_bond_qual
 
     def get_json(self, url: str) -> dict:
         now = datetime.datetime.now()
-        
+
         if self.last_api_time:
             delta = (now - self.last_api_time).total_seconds()
             if delta < self.API_DELAY:
-                time.sleep(self.API_DELAY-delta)
+                time.sleep(self.API_DELAY - delta)
         self.last_api_time = datetime.datetime.now()
         response = requests.get(url)
         return response.json()
@@ -182,24 +182,33 @@ class MOEX_API:
 
             # Checking basic search criteria
             condition = (
-                (search_criteria.min_days_to_maturity
-                <= bond.days_to_maturity
-                <= search_criteria.max_days_to_maturity)
-                and (search_criteria.min_bond_yield
-                <= bond.approximate_yield
-                <= search_criteria.max_bond_yield)
+                (
+                    search_criteria.min_days_to_maturity
+                    <= bond.days_to_maturity
+                    <= search_criteria.max_days_to_maturity
+                )
                 and (
-                    (search_criteria.face_units is None) or (bond.face_unit in search_criteria.face_units)
+                    search_criteria.min_bond_yield
+                    <= bond.approximate_yield
+                    <= search_criteria.max_bond_yield
+                )
+                and (
+                    (search_criteria.face_units is None)
+                    or (bond.face_unit in search_criteria.face_units)
                 )
             )
 
             if condition:
                 self.log.info(
                     f"Условие "
-                    f"доходности ({search_criteria.min_bond_yield}% <= {bond.approximate_yield}% <= {search_criteria.max_bond_yield}%), "
-                    f"дней до погашения ({search_criteria.min_days_to_maturity} <= {bond.days_to_maturity} <= {search_criteria.max_days_to_maturity}), "
-                    f"валюта ({bond.face_unit} в {search_criteria.face_units}) "
-                    f"для {ISIN} прошло."
+                    + f"доходности ({search_criteria.min_bond_yield}% <= {bond.approximate_yield}% <= {search_criteria.max_bond_yield}%), "
+                    + f"дней до погашения ({search_criteria.min_days_to_maturity} <= {bond.days_to_maturity} <= {search_criteria.max_days_to_maturity}), "
+                    + (
+                        f"валюта ({bond.face_unit} в {search_criteria.face_units}) "
+                        if search_criteria.face_units
+                        else ""
+                    )
+                    + f"для {ISIN} прошло."
                 )
 
                 if self.check_bond_qual:
