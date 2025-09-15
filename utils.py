@@ -4,6 +4,9 @@ from schemas import Bond, SearchCriteria
 logger = logging.getLogger("Utils")
 
 def filter_bonds(bonds: list[Bond], criteria: SearchCriteria) -> list[Bond]:
+    '''
+    Filters given bonds by criteria.
+    '''
     filtered_bonds = []
     for bond in bonds:
         condition = (
