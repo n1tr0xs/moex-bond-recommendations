@@ -6,7 +6,8 @@ from excel import ExcelBook
 import utils
 from schemas import Bond, SearchCriteria
 
-logger = logging.getLogger('Main')
+logger = logging.getLogger("Main")
+
 
 def main():
     # Search criteria setup
@@ -21,7 +22,9 @@ def main():
 
     # Logger setup
     logging.basicConfig(
-        filename=f"{datetime.datetime.now().strftime("%d.%m.%Y")}.log", filemode="w", level=logging.INFO
+        filename=f"{datetime.datetime.now().strftime("%d.%m.%Y")}.log",
+        filemode="w",
+        level=logging.INFO,
     )
 
     # Main
@@ -29,9 +32,9 @@ def main():
     moex_api = MOEX_API()
     bonds: list[Bond] = moex_api.get_bonds()
     bonds: list[Bond] = utils.filter_bonds(bonds, search_criteria)
+    bonds: list[Bond] = utils.add_credit_scores(bonds)
     ExcelBook().write(bonds)
     logger.info(f"Конец работы: {datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}")
-
 
 if __name__ == "__main__":
     main()

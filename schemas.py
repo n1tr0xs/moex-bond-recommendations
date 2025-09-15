@@ -25,7 +25,8 @@ class Bond:
         price: float,
         ACI: float,
         face_unit: str,
-        is_qualified: bool = None,
+        credit_score: str | None = None,
+        is_qualified: bool | None = None,
     ):
         self.ISIN: str = ISIN
         self.bond_name: str = name
@@ -36,12 +37,14 @@ class Bond:
         self.bond_price: float = price or float("inf")
         self.ACI: float = ACI
         self.face_unit: str = face_unit
+        self.credit_score: str = credit_score
         self.is_qualified: bool = is_qualified
 
     @classmethod
     def headers(cls):
         return [
             "Наименование",
+            "Кредитный рейтинг эмитента",
             "ISIN",
             "Номинал",
             "Цена на бирже",
@@ -56,6 +59,7 @@ class Bond:
     def as_list(self):
         return [
             self.bond_name,
+            self.credit_score or "",
             self.ISIN,
             self.face_value,
             self.broker_price,
