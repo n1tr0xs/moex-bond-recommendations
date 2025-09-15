@@ -49,6 +49,6 @@ def get_score(ISIN: str) -> str:
         score = div.find_next().text.strip()
         logger.info(f"Кредитный рейтинг эмитента облигации {ISIN} - {score}.")
     except AttributeError:
-        score = "Не известно"
+        score = "Неизвестно"
         logger.info(f"Кредитный рейтинг эмитента облигации {ISIN} не известен.")
     return score
