@@ -1,34 +1,51 @@
 ﻿import datetime
+import logging
 import openpyxl
 
 from schemas import *
-from log import Log
+
+logger = logging.getLogger('Excel')
 
 
 class ExcelBook:
-    def __init__(self, file_name_prefix: str = ""):
-        self.file_name = (
-            file_name_prefix + datetime.datetime.now().strftime("%d.%m.%Y") + ".xlsx"
-        )
+    def __init__(self, file_name: str = None):
+        self.file_name = file_name or datetime.datetime.now().strftime("%d.%m.%Y")
 
-    def write(self, bond_list: list[Bond], log: Log) -> None:
+    def write(self, bond_list: list[Bond]) -> None:
+        '''
+        Writes given bond_list to excel file.
+        '''
         wb = openpyxl.Workbook()
         ws = wb.active
+        logger.info("Запись данных в файл...")
+        # Add data to file
         ws.append(Bond.headers())
         for bond in bond_list:
             ws.append(bond.as_list)
         # Center data
+        logger.info("Центрирование ячеек таблицы...")
         self.center_worksheet(ws)
         # Auto-width
+        logger.info("Подбор ширины ячеек таблицы")
         self.auto_width(ws)
-        wb.save(self.file_name)
-        log.info(f"\nРезультаты сохранены в файл {self.file_name}.")
+        # Saving file
+        fileno = 0
+        while True:
+            try:
+                logger.info(f"Сохранение в файл {self.file_name}.")
+                wb.save(self.file_name + (f"({fileno})" if fileno else "") + '.xlsx')
+            except PermissionError:
+                logger.warning(f"Не удалось сохранить файл. Изменение имени файла...")
+                fileno += 1
+            else:
+                logger.info("Файл сохранен.")
+                return
 
     def center_worksheet(
         self, worksheet: openpyxl.worksheet.worksheet.Worksheet
     ) -> None:
         """
-        Centering data in worksheet.
+        Centers data in worksheet.
         """
         center_alignment = openpyxl.styles.Alignment(horizontal="center")
         for row in worksheet.iter_rows(
@@ -39,7 +56,7 @@ class ExcelBook:
         ):
             for cell in row:
                 cell.alignment = center_alignment
-        return
+        
 
     def auto_width(self, worksheet: openpyxl.worksheet.worksheet.Worksheet) -> None:
         """

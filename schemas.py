@@ -17,23 +17,23 @@ class Bond:
     def __init__(
         self,
         ISIN: str,
-        bond_name: str,
+        name: str,
         face_value: float,
         coupon_value: float,
         coupon_period: int,
         maturity_date: datetime.date,
-        bond_price: float,
+        price: float,
         ACI: float,
         face_unit: str,
         is_qualified: bool = None,
     ):
         self.ISIN: str = ISIN
-        self.bond_name: str = bond_name
+        self.bond_name: str = name
         self.face_value: float = face_value or 0
         self.coupon_value: float = coupon_value or 0
         self.coupon_period: int = coupon_period or float("inf")
         self.maturity_date: datetime.date = maturity_date
-        self.bond_price: float = bond_price or float("inf")
+        self.bond_price: float = price or float("inf")
         self.ACI: float = ACI
         self.face_unit: str = face_unit
         self.is_qualified: bool = is_qualified
