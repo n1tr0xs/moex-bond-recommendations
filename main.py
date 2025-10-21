@@ -25,10 +25,10 @@ def main():
     # Search criteria setup
     INF = float("inf")
     search_criteria: SearchCriteria = SearchCriteria(
-        min_bond_yield=20 / 0.87,
+        min_bond_yield=18 / 0.87,
         max_bond_yield=INF,
         min_days_to_maturity=1,
-        max_days_to_maturity=INF,
+        max_days_to_maturity=365,
         face_units=None,
     )
 
