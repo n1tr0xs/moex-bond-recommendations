@@ -15,8 +15,9 @@ class MOEX_API:
         Inits MOEX_API.
         """
         self.last_api_request = None
+        self.session = requests.Session()
 
-    def get_json(self, url: str) -> dict:
+    def get_json(self, url: str, params=None) -> dict:
         """
         Returns json from url.
         """
@@ -27,10 +28,17 @@ class MOEX_API:
             if wait_time > 0:
                 logger.info(f"Ожидание {wait_time}...")
                 time.sleep(self.API_DELAY - delta)
+        
         self.last_api_request = datetime.datetime.now()
+        
+        r = requests.Request('GET', url, params=params)
+        prepared = self.session.prepare_request(r)
+        
+        logger.info(f"Запрос к {prepared.url}.")
+
         try:
-            logger.info(f"Запрос к {url}.")
-            response = requests.get(url)
+            response = self.session.send(prepared)
+            response.raise_for_status()
         except:
             logger.warning(f"Не удалось установить соединение.")
             return {}
@@ -38,7 +46,7 @@ class MOEX_API:
         try:
             return response.json()
         except:
-            logger.warning(f"Не удалось получить json!")
+            logger.warning(f"Не удалось получить json.")
             return {}
 
     def get_boardgroup_bonds(self, boardgroup: str) -> list[Bond]:
@@ -47,8 +55,14 @@ class MOEX_API:
         """
         logger.info(f"Запрос данных для группы {boardgroup}.")
         bonds = []
-        url = f"https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/{boardgroup}/securities.json?iss.dp=comma&iss.meta=off&iss.only=securities&securities.columns=SECID,SHORTNAME,FACEVALUE,COUPONVALUE,COUPONPERIOD,MATDATE,PREVLEGALCLOSEPRICE,ACCRUEDINT,FACEUNIT&"
-        json = self.get_json(url)
+        url = f"https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/{boardgroup}/securities.json"
+        params = {
+            'iss.dp': 'comma',
+            'iss.meta': 'off',
+            'iss.only': 'securities',
+            'securities.columns': 'SECID,SHORTNAME,FACEVALUE,COUPONVALUE,COUPONPERIOD,MATDATE,PREVLEGALCLOSEPRICE,ACCRUEDINT,FACEUNIT',
+        }
+        json = self.get_json(url, params=params)
         securities = json.get("securities", {}).get("data", {})
         if not securities:
             logger.warning("Нет данных для группы {boardgroup}")
