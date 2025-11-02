@@ -64,12 +64,7 @@ class MOEX_API:
             return {}
         return self._parse_json(response)
 
-    def get_boardgroup_bonds(self, boardgroup: str) -> list[Bond]:
-        """
-        Returns all bonds from specified boardgroup.
-        """
-        logger.info(f"Запрос данных для группы {boardgroup}.")
-        bonds = []
+    def fetch_boardgroup_data(self, boardgroup: str) -> dict:
         url = f"https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/{boardgroup}/securities.json"
         params = {
             "iss.dp": "comma",
@@ -79,7 +74,15 @@ class MOEX_API:
         }
         json = self._get_json(url, params=params)
         securities = json.get("securities", {}).get("data", {})
-        data = {item[0]: item for item in securities}
+        return {item[0]: item for item in securities}
+
+    def get_boardgroup_bonds(self, boardgroup: str) -> list[Bond]:
+        """
+        Returns all bonds from specified boardgroup.
+        """
+        logger.info(f"Запрос данных для группы {boardgroup}.")
+        bonds = []
+        data = self.fetch_boardgroup_data(boardgroup)
         logger.info(f"В группе {boardgroup} обнаружено {len(data)} бумаг.")
         for i, ISIN in enumerate(data, start=1):
             logger.info(f"Обработка {i}/{len(data)} - {ISIN}.")
