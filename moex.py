@@ -86,7 +86,7 @@ class MOEX_API:
         """
         logger.info(f"Запрос данных для группы {boardgroup}.")
         bonds = []
-        securities = self.fetch_boardgroup_data(boardgroup)
+        securities = self.fetch_boardgroup_securities(boardgroup)
         logger.info(f"В группе {boardgroup} обнаружено {len(securities)} бумаг.")
         for i, ISIN in enumerate(securities, start=1):
             logger.info(f"Обработка {i}/{len(securities)} - {ISIN}.")
