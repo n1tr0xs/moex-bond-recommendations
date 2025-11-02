@@ -73,7 +73,7 @@ class Bond:
                 else "Да" if self.is_qualified else "Нет"
             ),
         ]
-    
+
     @property
     def broker_price(self):
         price = self.face_value * self.bond_price / 100  # no ACI

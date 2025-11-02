@@ -21,6 +21,7 @@ logging.basicConfig(
 
 logger = logging.getLogger("Main")
 
+
 def main():
     # Search criteria setup
     INF = float("inf")
