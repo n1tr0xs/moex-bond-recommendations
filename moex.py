@@ -79,9 +79,6 @@ class MOEX_API:
         }
         json = self.get_json(url, params=params)
         securities = json.get("securities", {}).get("data", {})
-        if not securities:
-            logger.warning("Нет данных для группы {boardgroup}")
-            return []
         data = {item[0]: item for item in securities}
         logger.info(f"В группе {boardgroup} обнаружено {len(data)} бумаг.")
         for i, ISIN in enumerate(data, start=1):
