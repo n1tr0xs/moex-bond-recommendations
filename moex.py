@@ -54,7 +54,7 @@ class MOEX_API:
             logger.warning(f"Не удалось получить json.")
             return {}
 
-    def get_json(self, url: str, params: dict | None = None) -> dict:
+    def _get_json(self, url: str, params: dict | None = None) -> dict:
         """
         Returns JSON from the specified URL, taking into account the delay between requests.
         """
@@ -77,7 +77,7 @@ class MOEX_API:
             "iss.only": "securities",
             "securities.columns": "SECID,SHORTNAME,FACEVALUE,COUPONVALUE,COUPONPERIOD,MATDATE,PREVLEGALCLOSEPRICE,ACCRUEDINT,FACEUNIT",
         }
-        json = self.get_json(url, params=params)
+        json = self._get_json(url, params=params)
         securities = json.get("securities", {}).get("data", {})
         data = {item[0]: item for item in securities}
         logger.info(f"В группе {boardgroup} обнаружено {len(data)} бумаг.")
