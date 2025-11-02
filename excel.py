@@ -11,7 +11,7 @@ class ExcelBook:
     def __init__(self, file_name: str = None):
         self.file_name = file_name or datetime.datetime.now().strftime("%d.%m.%Y")
 
-    def write(self, bond_list: list[Bond]) -> None:
+    def write_bonds(self, bond_list: list[Bond]) -> None:
         '''
         Writes given bond_list to excel file.
         '''
