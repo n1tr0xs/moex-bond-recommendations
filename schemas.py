@@ -97,12 +97,10 @@ class Bond:
 
     @property
     def coupons_amount(self):
-        if self.coupon_period:
-            full_coupons, part_coupon = divmod(
-                self.days_to_maturity, self.coupon_period
-            )
-        else:
-            full_coupons, part_coupon = 0, 0
+        if not self.coupon_period:
+            return 0
+
+        full_coupons, part_coupon = divmod(self.days_to_maturity, self.coupon_period)
         coupons = full_coupons + bool(part_coupon)
         return coupons
 
