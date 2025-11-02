@@ -41,6 +41,20 @@ class Bond:
         self.is_qualified: bool = is_qualified
 
     @classmethod
+    def from_list(cls, data: list):
+        return cls(
+            ISIN=data[0],
+            name=data[1],
+            face_value=float(data[2]),
+            coupon_value=float(data[3]),
+            coupon_period=float(data[4]),
+            maturity_date=datetime.datetime.strptime(data[5], "%Y-%m-%d").date(),
+            price=float(data[6]),
+            ACI=float(data[7]),
+            face_unit=data[8],
+        )
+
+    @classmethod
     def headers(cls):
         return [
             "Наименование",

@@ -93,23 +93,9 @@ class MOEX_API:
 
             bond_data = securities[ISIN]
             try:
-                bond = Bond(
-                    ISIN=ISIN,
-                    name=bond_data[1],
-                    face_value=float(bond_data[2]),
-                    coupon_value=float(bond_data[3]),
-                    coupon_period=float(bond_data[4]),
-                    maturity_date=datetime.datetime.strptime(
-                        bond_data[5], "%Y-%m-%d"
-                    ).date(),
-                    price=float(bond_data[6]),
-                    ACI=float(bond_data[7]),
-                    face_unit=bond_data[8],
-                )
+                bonds.append(Bond.from_list(bond_data))
             except Exception as e:
                 logger.warning(f"Ошибка при получении информации по {ISIN}.")
-            else:
-                bonds.append(bond)
 
         return bonds
 
