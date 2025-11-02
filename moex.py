@@ -65,6 +65,10 @@ class MOEX_API:
         return self._parse_json(response)
 
     def fetch_boardgroup_securities(self, boardgroup: str) -> dict:
+        """
+        Returns dictionary of securities found on specified boardgroup.
+        Format of dictionary: ISIN -> security_data
+        """
         url = f"https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/{boardgroup}/securities.json"
         params = {
             "iss.dp": "comma",
