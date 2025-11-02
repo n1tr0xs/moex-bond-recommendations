@@ -59,7 +59,7 @@ class Bond:
     def as_list(self):
         return [
             self.bond_name,
-            self.credit_score or "",
+            self.credit_score or "Неизвестно",
             self.ISIN,
             self.face_value,
             self.broker_price,
@@ -73,7 +73,7 @@ class Bond:
                 else "Да" if self.is_qualified else "Нет"
             ),
         ]
-
+    
     @property
     def broker_price(self):
         price = self.face_value * self.bond_price / 100  # no ACI
