@@ -40,6 +40,7 @@ def main():
     bonds: list[Bond] = moex_api.get_bonds()
     bonds: list[Bond] = utils.filter_bonds(bonds, search_criteria)
     bonds: list[Bond] = utils.add_credit_scores(bonds)
+    bonds.sort(key=lambda b: -b.approximate_yield)
     ExcelBook().write(bonds)
     logger.info(
         f"Конец работы: {datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}"
