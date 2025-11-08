@@ -25,18 +25,7 @@ class ExcelBook:
         self._center_worksheet(ws)
         self._auto_width(ws)
 
-        # Saving file
-        fileno = 0
-        while True:
-            try:
-                logger.info(f"Сохранение в файл {self.file_name}.")
-                wb.save(self.file_name + (f"({fileno})" if fileno else "") + ".xlsx")
-            except PermissionError:
-                logger.warning(f"Не удалось сохранить файл. Изменение имени файла...")
-                fileno += 1
-            else:
-                logger.info("Файл сохранен.")
-                return
+        self._save_with_retries(wb)
 
     def _center_worksheet(
         self, worksheet: openpyxl.worksheet.worksheet.Worksheet
@@ -66,6 +55,19 @@ class ExcelBook:
                 openpyxl.utils.get_column_letter(column_cells[0].col_idx)
             ].width = (length * 1.2)
         return
+
+    def _save_with_retries(self, wb: openpyxl.Workbook) -> None:
+        fileno = 0
+        while True:
+            try:
+                logger.info(f"Сохранение в файл {self.file_name}.")
+                wb.save(self.file_name + (f"({fileno})" if fileno else "") + ".xlsx")
+            except PermissionError:
+                logger.warning(f"Не удалось сохранить файл. Изменение имени файла...")
+                fileno += 1
+            else:
+                logger.info("Файл сохранен.")
+                return
 
     def get_file_name(self) -> str:
         return self.file_name
