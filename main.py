@@ -9,6 +9,8 @@ from schemas import Bond, SearchCriteria
 # Logger setup
 logging.basicConfig(
     level=logging.INFO,
+    format="%(asctime)s - %(name)s:%(levelname)s - %(message)s",
+    datefmt="%d.%m.%Y %H:%M:%S",
     handlers=[
         logging.FileHandler(
             f"{datetime.datetime.now().strftime("%d.%m.%Y")}.log",
@@ -34,9 +36,7 @@ def main():
     )
 
     # Main
-    logger.info(
-        f"Начало работы: {datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}"
-    )
+    logger.info(f"Начало работы")
     moex_api = MOEX_API()
     bonds: list[Bond] = moex_api.get_bonds()
     bonds: list[Bond] = utils.filter_bonds(bonds, search_criteria)
@@ -46,9 +46,7 @@ def main():
     book = ExcelBook()
     book.write_bonds(bonds)
 
-    logger.info(
-        f"Конец работы: {datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}"
-    )
+    logger.info(f"Конец работы")
 
 
 if __name__ == "__main__":
