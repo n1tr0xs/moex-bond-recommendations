@@ -40,7 +40,7 @@ def main():
     moex_api = MOEX_API()
     bonds: list[Bond] = moex_api.get_bonds()
     bonds: list[Bond] = utils.filter_bonds(bonds, search_criteria)
-    bonds: list[Bond] = utils.add_credit_scores(bonds)
+    bonds: list[Bond] = utils.with_credit_scores(bonds)
     bonds.sort(key=lambda b: -b.approximate_yield)
 
     book = ExcelBook()

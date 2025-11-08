@@ -30,7 +30,7 @@ def filter_bonds(bonds: list[Bond], criteria: SearchCriteria) -> list[Bond]:
     return filtered_bonds
 
 
-def add_credit_scores(bonds: list[Bond]) -> list[Bond]:
+def with_credit_scores(bonds: list[Bond]) -> list[Bond]:
     """
     Adds credit scores to all bonds from list.
     """
