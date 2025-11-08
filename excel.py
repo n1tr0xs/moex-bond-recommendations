@@ -8,8 +8,9 @@ logger = logging.getLogger("Excel")
 
 
 class ExcelBook:
-    def __init__(self, file_name: str = None):
+    def __init__(self, file_name: str = None, max_save_attempts: int = 5):
         self.file_name = file_name or datetime.datetime.now().strftime("%d.%m.%Y")
+        self.max_save_attempts = max_save_attempts
 
     def write_bonds(self, bond_list: list[Bond]) -> None:
         """
@@ -57,17 +58,27 @@ class ExcelBook:
         return
 
     def _save_with_retries(self, wb: openpyxl.Workbook) -> None:
-        fileno = 0
-        while True:
+        """
+        Tries to save file self.max_save_attempts times.
+        If file couldn't be saved - raises IOError.
+        """
+        attempt = 0
+        while attempt < self.max_save_attempts:
             try:
-                logger.info(f"Сохранение в файл {self.file_name}.")
-                wb.save(self.file_name + (f"({fileno})" if fileno else "") + ".xlsx")
-            except PermissionError:
-                logger.warning(f"Не удалось сохранить файл. Изменение имени файла...")
-                fileno += 1
-            else:
-                logger.info("Файл сохранен.")
+                filename = (
+                    self.file_name + (f"({attempt})" if attempt else "") + ".xlsx"
+                )
+                wb.save(filename)
+                logger.info(f"Файл сохранен: {filename}.")
                 return
+            except PermissionError:
+                logger.warning(
+                    f"Не удалось сохранить файл {filename}, пробую другое имя..."
+                )
+                attempt += 1
+        raise IOError(
+            f"Не удалось сохранить файл после {self.max_save_attempts} попыток."
+        )
 
     def get_file_name(self) -> str:
         return self.file_name
