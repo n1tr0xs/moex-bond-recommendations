@@ -95,7 +95,9 @@ class MOEX_API:
             try:
                 bonds.append(Bond.from_list(bond_data))
             except Exception as e:
-                logger.warning(f"Ошибка при получении информации по {ISIN}. Информация по облигации: {bond_data}.")
+                logger.warning(
+                    f"Ошибка при получении информации по {ISIN}. Информация по облигации: {bond_data}."
+                )
 
         return bonds
 
