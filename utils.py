@@ -1,5 +1,6 @@
 import logging
 import requests
+import copy
 from bs4 import BeautifulSoup
 from schemas import Bond, SearchCriteria
 
@@ -28,18 +29,21 @@ def filter_bonds(bonds: list[Bond], criteria: SearchCriteria) -> list[Bond]:
             logger.info(f"Облигация {bond.ISIN} не прошла проверку критериев.")
     return filtered_bonds
 
+
 def add_credit_scores(bonds: list[Bond]) -> list[Bond]:
-    '''
-    Adds credit scores in-place to all bonds from list.
-    '''
-    for bond in bonds:
+    """
+    Adds credit scores to all bonds from list.
+    """
+    new_bonds = copy.deepcopy(bonds)
+    for bond in new_bonds:
         bond.credit_score = get_score(bond.ISIN)
-    return bonds
+    return new_bonds
+
 
 def get_score(ISIN: str) -> str:
-    '''
+    """
     Parses credit score using smartLab.
-    '''
+    """
     logger.info(f"Получение кредитного рейтинга эмитента облигации {ISIN}.")
     BASE_URL = "https://smart-lab.ru/q/bonds/{}"
     response = requests.get(BASE_URL.format(ISIN))
