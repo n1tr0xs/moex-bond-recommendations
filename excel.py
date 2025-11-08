@@ -24,7 +24,7 @@ class ExcelBook:
             ws.append(bond.as_list)
         # Center data
         logger.info("Центрирование ячеек таблицы...")
-        self.center_worksheet(ws)
+        self._center_worksheet(ws)
         # Auto-width
         logger.info("Подбор ширины ячеек таблицы")
         self.auto_width(ws)
@@ -41,7 +41,7 @@ class ExcelBook:
                 logger.info("Файл сохранен.")
                 return
 
-    def center_worksheet(
+    def _center_worksheet(
         self, worksheet: openpyxl.worksheet.worksheet.Worksheet
     ) -> None:
         """
