@@ -42,7 +42,11 @@ def main():
     bonds: list[Bond] = utils.filter_bonds(bonds, search_criteria)
     bonds: list[Bond] = utils.add_credit_scores(bonds)
     bonds.sort(key=lambda b: -b.approximate_yield)
-    ExcelBook().write_bonds(bonds)
+    
+    book = ExcelBook()
+    book.write_bonds(bonds)
+
+    logger.info(f"Результат работы сохранен в файл {book.get_file_name()}")
     logger.info(
         f"Конец работы: {datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}"
     )
