@@ -9,7 +9,7 @@ logger = logging.getLogger("Excel")
 
 class ExcelBook:
     def __init__(self, file_name: str = None, max_save_attempts: int = 5):
-        self.file_name = file_name or datetime.datetime.now().strftime("%d.%m.%Y")
+        self.file_name = self._normalize_file_name(file_name)
         self.max_save_attempts = max_save_attempts
 
     def write_bonds(self, bond_list: list[Bond]) -> None:
@@ -27,6 +27,18 @@ class ExcelBook:
         self._auto_width(ws)
 
         self._save_with_retries(wb)
+
+    @staticmethod
+    def _normalize_file_name(file_name: str | None) -> str:
+        """
+        Normalizes given file name.
+        If no file name given - sets default file name to current date `%d.%m.%Y`.
+        """
+        if file_name is None:
+            file_name = datetime.datetime.now().strftime("%d.%m.%Y")
+        if not file_name.endswith(".xlsx"):
+            file_name += ".xlsx"
+        return file_name
 
     def _center_worksheet(
         self, worksheet: openpyxl.worksheet.worksheet.Worksheet
@@ -79,6 +91,3 @@ class ExcelBook:
         raise IOError(
             f"Не удалось сохранить файл после {self.max_save_attempts} попыток."
         )
-
-    def get_file_name(self) -> str:
-        return self.file_name
