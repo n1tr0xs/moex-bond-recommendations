@@ -17,17 +17,14 @@ class ExcelBook:
         """
         wb = openpyxl.Workbook()
         ws = wb.active
-        logger.info("Запись данных в файл...")
-        # Add data to file
+
         ws.append(Bond.headers())
         for bond in bond_list:
             ws.append(bond.as_list)
-        # Center data
-        logger.info("Центрирование ячеек таблицы...")
+
         self._center_worksheet(ws)
-        # Auto-width
-        logger.info("Подбор ширины ячеек таблицы")
         self._auto_width(ws)
+
         # Saving file
         fileno = 0
         while True:
@@ -47,6 +44,7 @@ class ExcelBook:
         """
         Centers data in worksheet.
         """
+        logger.info("Центрирование ячеек таблицы...")
         center_alignment = openpyxl.styles.Alignment(horizontal="center")
         for row in worksheet.iter_rows(
             min_row=1,
@@ -61,6 +59,7 @@ class ExcelBook:
         """
         Sets width to fit content
         """
+        logger.info("Подбор ширины ячеек таблицы")
         for column_cells in worksheet.columns:
             length = max(len(str(cell.value)) for cell in column_cells if cell.value)
             worksheet.column_dimensions[
