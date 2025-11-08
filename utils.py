@@ -36,11 +36,11 @@ def with_credit_scores(bonds: list[Bond]) -> list[Bond]:
     """
     new_bonds = copy.deepcopy(bonds)
     for bond in new_bonds:
-        bond.credit_score = get_score(bond.ISIN)
+        bond.credit_score = _get_credit_score_SMARTLAB(bond.ISIN)
     return new_bonds
 
 
-def get_score(ISIN: str) -> str:
+def _get_credit_score_SMARTLAB(ISIN: str) -> str:
     """
     Parses credit score using smartLab.
     """
