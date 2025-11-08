@@ -27,7 +27,7 @@ class ExcelBook:
         self._center_worksheet(ws)
         # Auto-width
         logger.info("Подбор ширины ячеек таблицы")
-        self.auto_width(ws)
+        self._auto_width(ws)
         # Saving file
         fileno = 0
         while True:
@@ -57,7 +57,7 @@ class ExcelBook:
             for cell in row:
                 cell.alignment = center_alignment
 
-    def auto_width(self, worksheet: openpyxl.worksheet.worksheet.Worksheet) -> None:
+    def _auto_width(self, worksheet: openpyxl.worksheet.worksheet.Worksheet) -> None:
         """
         Sets width to fit content
         """
