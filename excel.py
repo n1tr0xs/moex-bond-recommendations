@@ -78,7 +78,7 @@ class ExcelBook:
         while attempt < self.max_save_attempts:
             try:
                 filename = (
-                    self.file_name + (f"({attempt})" if attempt else "") + ".xlsx"
+                    self.file_name + (f"({attempt})" if attempt else "")
                 )
                 wb.save(filename)
                 logger.info(f"Файл сохранен: {filename}.")
