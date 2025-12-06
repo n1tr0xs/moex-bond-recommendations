@@ -18,7 +18,7 @@
     <rect>
      <x>1</x>
      <y>1</y>
-     <width>209</width>
+     <width>252</width>
      <height>170</height>
     </rect>
    </property>
@@ -36,7 +36,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QDoubleSpinBox" name="minBondYieldSpinBox"/>
+       <widget class="QDoubleSpinBox" name="minBondYieldSpinBox">
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -70,7 +74,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="minDaysToMaturitySpinBox"/>
+           <widget class="QSpinBox" name="minDaysToMaturitySpinBox">
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -87,7 +95,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="maxDaysToMaturitySpinBox"/>
+           <widget class="QSpinBox" name="maxDaysToMaturitySpinBox">
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

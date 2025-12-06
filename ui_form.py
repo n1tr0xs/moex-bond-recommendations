@@ -26,7 +26,7 @@ class Ui_Widget(object):
         Widget.resize(209, 174)
         self.layoutWidget = QWidget(Widget)
         self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(1, 1, 209, 170))
+        self.layoutWidget.setGeometry(QRect(1, 1, 252, 170))
         self.verticalLayout_4 = QVBoxLayout(self.layoutWidget)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -40,6 +40,7 @@ class Ui_Widget(object):
 
         self.minBondYieldSpinBox = QDoubleSpinBox(self.layoutWidget)
         self.minBondYieldSpinBox.setObjectName(u"minBondYieldSpinBox")
+        self.minBondYieldSpinBox.setMaximum(999999999.000000000000000)
 
         self.horizontalLayout_2.addWidget(self.minBondYieldSpinBox)
 
@@ -67,6 +68,7 @@ class Ui_Widget(object):
 
         self.minDaysToMaturitySpinBox = QSpinBox(self.layoutWidget)
         self.minDaysToMaturitySpinBox.setObjectName(u"minDaysToMaturitySpinBox")
+        self.minDaysToMaturitySpinBox.setMaximum(999999999)
 
         self.verticalLayout_2.addWidget(self.minDaysToMaturitySpinBox)
 
@@ -83,6 +85,7 @@ class Ui_Widget(object):
 
         self.maxDaysToMaturitySpinBox = QSpinBox(self.layoutWidget)
         self.maxDaysToMaturitySpinBox.setObjectName(u"maxDaysToMaturitySpinBox")
+        self.maxDaysToMaturitySpinBox.setMaximum(999999999)
 
         self.verticalLayout.addWidget(self.maxDaysToMaturitySpinBox)
 
