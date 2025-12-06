@@ -57,8 +57,8 @@ class Widget(QWidget):
         super().__init__(parent)
         self.ui = Ui_Widget()
         self.ui.setupUi(self)
+        
         self.ui.buttonStart.clicked.connect(self.onBtnClick)
-        self.ui.progressBar.setValue(0)
 
     def onBtnClick(self):       
         # Search criteria setup

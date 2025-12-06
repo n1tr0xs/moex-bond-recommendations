@@ -23,7 +23,7 @@ class Ui_Widget(object):
     def setupUi(self, Widget):
         if not Widget.objectName():
             Widget.setObjectName(u"Widget")
-        Widget.resize(209, 174)
+        Widget.resize(255, 174)
         self.layoutWidget = QWidget(Widget)
         self.layoutWidget.setObjectName(u"layoutWidget")
         self.layoutWidget.setGeometry(QRect(1, 1, 252, 170))
@@ -105,7 +105,7 @@ class Ui_Widget(object):
 
         self.progressBar = QProgressBar(self.layoutWidget)
         self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setValue(24)
+        self.progressBar.setValue(0)
 
         self.verticalLayout_4.addWidget(self.progressBar)
 
